@@ -1,0 +1,75 @@
+package config
+
+import (
+	"errors"
+	"fmt"
+
+	"github.com/ilyakaznacheev/cleanenv"
+)
+
+type Config struct {
+	Approve Approve `yaml:"approve"`
+	GitLab  GitLabConfig
+}
+
+type Approve struct {
+	MinApprovalRole  int      `yaml:"minApprovalRole" env:"APPROVE_MIN_APPROVAL_ROLE" env-default:"40"`
+	ApprovalAuthors  []string `yaml:"approvalAuthors" env:"APPROVE_APPROVAL_AUTHORS"`
+	MinApprovalCount int      `yaml:"minApprovalCount" env:"APPROVE_MIN_APPROVAL_COUNT" env-default:"1"`
+}
+
+type GitLabConfig struct {
+	Token           string `env:"GITLAB_TOKEN"`
+	Host            string `env:"CI_SERVER_HOST"`
+	ProjectID       string `env:"CI_PROJECT_ID"`
+	MergeRequestIID int64  `env:"CI_MERGE_REQUEST_IID"`
+}
+
+func GetConfig(path string) (*Config, error) {
+	defaultPath := "approve-checker.yml"
+	if path == "" {
+		path = defaultPath
+	}
+
+	cfg := &Config{
+		Approve: Approve{},
+	}
+
+	if err := cleanenv.ReadConfig(path, cfg); err != nil {
+		return nil, fmt.Errorf("parse config was failed, err: %w", err)
+	}
+
+	if err := cfg.validate(); err != nil {
+		return nil, fmt.Errorf("config validation was failed, err: %w", err)
+	}
+
+	return cfg, nil
+}
+
+func (cfg *Config) validate() error {
+	if cfg.Approve.MinApprovalCount < 1 {
+		return errors.New("the minimum number of approvals should be more than 1")
+	}
+
+	if len(cfg.Approve.ApprovalAuthors) == 0 && cfg.Approve.MinApprovalRole < 0 {
+		return errors.New("should set approval authors or the minimum role that can approve an MR")
+	}
+
+	if cfg.GitLab.Token == "" {
+		return errors.New("environment variables GITLAB_TOKEN is required")
+	}
+
+	if cfg.GitLab.Host == "" {
+		return errors.New("environment variables CI_SERVER_HOST is required")
+	}
+
+	if cfg.GitLab.ProjectID == "" {
+		return errors.New("environment variables CI_PROJECT_ID is required")
+	}
+
+	if cfg.GitLab.MergeRequestIID == 0 {
+		return errors.New("environment variables CI_MERGE_REQUEST_IID is required")
+	}
+
+	return nil
+}
