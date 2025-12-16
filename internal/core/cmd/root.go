@@ -15,7 +15,7 @@ import (
 var configPath = ""
 
 var rootCmd = &cobra.Command{
-	Use:   "approve-checker",
+	Use:   "approve_checker",
 	Short: "Check mr approve in GitLab CI",
 	Long:  `CLI app, that check count of approve votes in GitLab merge-request.`,
 	Run: func(cmd *cobra.Command, _ []string) {
