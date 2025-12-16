@@ -22,7 +22,7 @@ type Approve struct {
 
 type GitLabConfig struct {
 	Token           string `env:"CI_JOB_TOKEN"`
-	Host            string `env:"CI_SERVER_HOST"`
+	Host            string `env:"CI_SERVER_URL"`
 	ProjectID       string `env:"CI_PROJECT_ID"`
 	MergeRequestIID int64  `env:"CI_MERGE_REQUEST_IID"`
 }
@@ -51,7 +51,7 @@ func (cfg *Config) String() string {
 	presentation = append(presentation, fmt.Sprintf("APPROVE_APPROVAL_AUTHORS : %s", strings.Join(cfg.Approve.ApprovalAuthors, ", ")))
 	presentation = append(presentation, fmt.Sprintf("APPROVE_MIN_APPROVAL_COUNT : %d", cfg.Approve.MinApprovalCount))
 	presentation = append(presentation, fmt.Sprintf("CI_JOB_TOKEN : %s", cfg.GitLab.Token))
-	presentation = append(presentation, fmt.Sprintf("CI_SERVER_HOST : %s", cfg.GitLab.Host))
+	presentation = append(presentation, fmt.Sprintf("CI_SERVER_URL : %s", cfg.GitLab.Host))
 	presentation = append(presentation, fmt.Sprintf("CI_PROJECT_ID : %s", cfg.GitLab.ProjectID))
 	presentation = append(presentation, fmt.Sprintf("CI_MERGE_REQUEST_IID : %d", cfg.GitLab.MergeRequestIID))
 
@@ -72,7 +72,7 @@ func (cfg *Config) validate() error {
 	}
 
 	if cfg.GitLab.Host == "" {
-		return errors.New("environment variables CI_SERVER_HOST is required")
+		return errors.New("environment variables CI_SERVER_URL is required")
 	}
 
 	if cfg.GitLab.ProjectID == "" {
