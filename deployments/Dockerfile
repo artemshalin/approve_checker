@@ -9,5 +9,4 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o bin/approve_chec
 # Runtime stage
 FROM scratch
 COPY --from=build /app/bin/approve_checker /bin/approve_checker
-
-ENTRYPOINT ["/bin/approve_checker"]
+CMD ["approve_checker"]
