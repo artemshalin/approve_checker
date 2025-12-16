@@ -15,8 +15,8 @@ before:
     - go generate ./...
 
 builds:
-  - binary: freeport
-    main: ./cmd/freeport
+  - binary: approve_checker
+    main: ./cmd/approve_checker
     goarch:
       - amd64
       - arm64
