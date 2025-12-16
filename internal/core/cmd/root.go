@@ -12,22 +12,20 @@ import (
 	"gitlab.levelgroup.ru/devops/approve-checker/internal/services/gitlab"
 )
 
-var configPath = ""
-
 var rootCmd = &cobra.Command{
 	Use:   "approve_checker",
 	Short: "Check mr approve in GitLab CI",
 	Long:  `CLI app, that check count of approve votes in GitLab merge-request.`,
 	Run: func(cmd *cobra.Command, _ []string) {
-		cfg, err := config.GetConfig(configPath)
+		cfg, err := config.GetConfig()
 		if err != nil {
-			slog.Error("get config failed", "path", configPath, "err", err)
+			slog.Error("get config failed", "err", err)
 			os.Exit(1)
 		}
 
 		c, err := gitlab.NewClient(cfg)
 		if err != nil {
-			slog.Error("make gitlab client was failed", "path", configPath, "err", err)
+			slog.Error("make gitlab client was failed", "err", err)
 			os.Exit(1)
 		}
 
@@ -60,8 +58,4 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "./approve-checker.yml", "path to yaml config")
 }

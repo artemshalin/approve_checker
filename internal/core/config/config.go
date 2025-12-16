@@ -13,9 +13,9 @@ type Config struct {
 }
 
 type Approve struct {
-	MinApprovalRole  int      `yaml:"minApprovalRole" env:"APPROVE_MIN_APPROVAL_ROLE" env-default:"40"`
-	ApprovalAuthors  []string `yaml:"approvalAuthors" env:"APPROVE_APPROVAL_AUTHORS"`
-	MinApprovalCount int      `yaml:"minApprovalCount" env:"APPROVE_MIN_APPROVAL_COUNT" env-default:"1"`
+	MinApprovalRole  int      `env:"APPROVE_MIN_APPROVAL_ROLE" env-default:"40"`
+	ApprovalAuthors  []string `env:"APPROVE_APPROVAL_AUTHORS"`
+	MinApprovalCount int      `env:"APPROVE_MIN_APPROVAL_COUNT" env-default:"1"`
 }
 
 type GitLabConfig struct {
@@ -25,17 +25,12 @@ type GitLabConfig struct {
 	MergeRequestIID int64  `env:"CI_MERGE_REQUEST_IID"`
 }
 
-func GetConfig(path string) (*Config, error) {
-	defaultPath := "approve-checker.yml"
-	if path == "" {
-		path = defaultPath
-	}
-
+func GetConfig() (*Config, error) {
 	cfg := &Config{
 		Approve: Approve{},
 	}
 
-	if err := cleanenv.ReadConfig(path, cfg); err != nil {
+	if err := cleanenv.ReadEnv(cfg); err != nil {
 		return nil, fmt.Errorf("parse config was failed, err: %w", err)
 	}
 
