@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -41,6 +42,19 @@ func GetConfig() (*Config, error) {
 	return cfg, nil
 }
 
+func (cfg *Config) String() string {
+	presentation := make([]string, 0)
+	presentation = append(presentation, fmt.Sprintf("APPROVE_MIN_APPROVAL_ROLE : %d", cfg.Approve.MinApprovalRole))
+	presentation = append(presentation, fmt.Sprintf("APPROVE_APPROVAL_AUTHORS : %s", strings.Join(cfg.Approve.ApprovalAuthors, ", ")))
+	presentation = append(presentation, fmt.Sprintf("APPROVE_MIN_APPROVAL_COUNT : %d", cfg.Approve.MinApprovalCount))
+	presentation = append(presentation, fmt.Sprintf("CI_JOB_TOKEN : %s", cfg.GitLab.Token))
+	presentation = append(presentation, fmt.Sprintf("CI_SERVER_HOST : %s", cfg.GitLab.Host))
+	presentation = append(presentation, fmt.Sprintf("CI_PROJECT_ID : %s", cfg.GitLab.ProjectID))
+	presentation = append(presentation, fmt.Sprintf("CI_MERGE_REQUEST_IID : %d", cfg.GitLab.MergeRequestIID))
+
+	return strings.Join(presentation, "\n")
+}
+
 func (cfg *Config) validate() error {
 	if cfg.Approve.MinApprovalCount < 1 {
 		return errors.New("the minimum number of approvals should be more than 1")
@@ -51,7 +65,7 @@ func (cfg *Config) validate() error {
 	}
 
 	if cfg.GitLab.Token == "" {
-		return errors.New("environment variables GITLAB_TOKEN is required")
+		return errors.New("environment variables CI_JOB_TOKEN is required")
 	}
 
 	if cfg.GitLab.Host == "" {
