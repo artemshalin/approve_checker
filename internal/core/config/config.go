@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -34,6 +35,8 @@ func GetConfig() (*Config, error) {
 	if err := cleanenv.ReadEnv(cfg); err != nil {
 		return nil, fmt.Errorf("parse config was failed, err: %w", err)
 	}
+
+	slog.Info("current", "config", cfg.String())
 
 	if err := cfg.validate(); err != nil {
 		return nil, fmt.Errorf("config validation was failed, err: %w", err)

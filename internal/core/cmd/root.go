@@ -23,8 +23,6 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		slog.Info("current", "config", cfg.String())
-
 		c, err := gitlab.NewClient(cfg)
 		if err != nil {
 			slog.Error("make gitlab client was failed", "err", err)
