@@ -19,7 +19,7 @@ type Approve struct {
 }
 
 type GitLabConfig struct {
-	Token           string `env:"GITLAB_TOKEN"`
+	Token           string `env:"CI_JOB_TOKEN"`
 	Host            string `env:"CI_SERVER_HOST"`
 	ProjectID       string `env:"CI_PROJECT_ID"`
 	MergeRequestIID int64  `env:"CI_MERGE_REQUEST_IID"`
