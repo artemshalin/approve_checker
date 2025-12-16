@@ -7,7 +7,7 @@ ARG TARGETOS TARGETARCH
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o bin/approve_checker ./cmd/approve_checker
 
 # Runtime stage
-FROM alpine
+FROM scratch
 COPY --from=build /app/bin/approve_checker /bin/approve_checker
 
 ENTRYPOINT ["/bin/approve_checker"]
