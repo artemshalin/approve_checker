@@ -58,7 +58,7 @@ stages:
 check-mr-approve:
   stage: test    
   image: 
-    name: ghcr.io/artemshalin/approve_checker:latest
+    name: ghcr.io/artemshalin/approve_checker:v1.0.1
     entrypoint: [""]
   tags: 
     - docker
@@ -67,5 +67,3 @@ check-mr-approve:
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "stage" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"'
 ```
-
-Версию компонента можно посмотреть в каталоге CI/CD.
