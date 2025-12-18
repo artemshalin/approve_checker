@@ -1,7 +1,7 @@
 # Builder stage
 FROM --platform=$BUILDPLATFORM golang:1.25.5 AS build
 LABEL stage=intermediate
-RUN apk add --no-cache ca-certificates
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
 ARG TARGETOS TARGETARCH
