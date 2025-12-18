@@ -60,8 +60,6 @@ check-mr-approve:
   image: 
     name: ghcr.io/artemshalin/approve_checker:v1.0.1
     entrypoint: [""]
-  tags: 
-    - docker
   script:
     - /usr/local/bin/approve_checker
   rules:
