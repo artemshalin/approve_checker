@@ -8,7 +8,8 @@ ARG TARGETOS TARGETARCH
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o bin/approve_checker ./cmd/approve_checker
 
 # Runtime stage
-FROM scratch
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /app/bin/approve_checker /bin/approve_checker
-CMD ["approve_checker"]
+FROM alpine:3.23.2  
+WORKDIR /root/  
+COPY --from=build /app/bin/approve_checker ./approve_checker
+RUN apk --no-cache add ca-certificates  
+CMD ["./approve_checker"]
