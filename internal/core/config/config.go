@@ -3,8 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"log/slog"
-	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -21,7 +19,7 @@ type Approve struct {
 }
 
 type GitLabConfig struct {
-	Token           string `env:"GTILAB_TOKEN"`
+	Token           string `env:"GITLAB_TOKEN"`
 	Host            string `env:"CI_SERVER_URL"`
 	ProjectID       string `env:"CI_PROJECT_ID"`
 	MergeRequestIID int64  `env:"CI_MERGE_REQUEST_IID"`
@@ -36,26 +34,11 @@ func GetConfig() (*Config, error) {
 		return nil, fmt.Errorf("parse config was failed, err: %w", err)
 	}
 
-	slog.Info("current", "config", cfg.String())
-
 	if err := cfg.validate(); err != nil {
 		return nil, fmt.Errorf("config validation was failed, err: %w", err)
 	}
 
 	return cfg, nil
-}
-
-func (cfg *Config) String() string {
-	presentation := make([]string, 0)
-	presentation = append(presentation, fmt.Sprintf("APPROVE_MIN_APPROVAL_ROLE : %d", cfg.Approve.MinApprovalRole))
-	presentation = append(presentation, fmt.Sprintf("APPROVE_APPROVAL_AUTHORS : %s", strings.Join(cfg.Approve.ApprovalAuthors, ", ")))
-	presentation = append(presentation, fmt.Sprintf("APPROVE_MIN_APPROVAL_COUNT : %d", cfg.Approve.MinApprovalCount))
-	presentation = append(presentation, fmt.Sprintf("GTILAB_TOKEN : %s", cfg.GitLab.Token))
-	presentation = append(presentation, fmt.Sprintf("CI_SERVER_URL : %s", cfg.GitLab.Host))
-	presentation = append(presentation, fmt.Sprintf("CI_PROJECT_ID : %s", cfg.GitLab.ProjectID))
-	presentation = append(presentation, fmt.Sprintf("CI_MERGE_REQUEST_IID : %d", cfg.GitLab.MergeRequestIID))
-
-	return strings.Join(presentation, "\n")
 }
 
 func (cfg *Config) validate() error {
@@ -68,7 +51,7 @@ func (cfg *Config) validate() error {
 	}
 
 	if cfg.GitLab.Token == "" {
-		return errors.New("environment variables GTILAB_TOKEN is required")
+		return errors.New("environment variables GITLAB_TOKEN is required")
 	}
 
 	if cfg.GitLab.Host == "" {

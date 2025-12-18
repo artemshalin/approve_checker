@@ -3,6 +3,7 @@ package gitlab
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"slices"
 
 	gitlab "gitlab.com/gitlab-org/api/client-go"
@@ -49,18 +50,26 @@ func (c *Client) MergeRequestWasApproved(ctx context.Context, cfg *config.Config
 		}
 
 		// if check personal approves by users was failed, than check by minimal role
-		m, _, err := c.git.ProjectMembers.GetProjectMember(
+		mbrs, resp, err := c.git.ProjectMembers.ListAllProjectMembers(
 			cfg.GitLab.ProjectID,
-			approved.User.ID,
+			&gitlab.ListProjectMembersOptions{
+				ListOptions: gitlab.ListOptions{Page: 1, PerPage: 1},
+				UserIDs:     &[]int64{approved.User.ID},
+			},
 			gitlab.WithContext(ctx),
 		)
+		if resp.StatusCode == http.StatusNotFound {
+			continue
+		}
 		if err != nil {
 			return false, fmt.Errorf("an error occurred while get project members, err: %w", err)
 		}
 
-		if m.AccessLevel >= gitlab.AccessLevelValue(cfg.Approve.MinApprovalRole) {
-			approvedBy[approved] = true
-			approvedCount++
+		for _, m := range mbrs {
+			if m.AccessLevel >= gitlab.AccessLevelValue(cfg.Approve.MinApprovalRole) {
+				approvedBy[approved] = true
+				approvedCount++
+			}
 		}
 	}
 

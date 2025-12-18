@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"gitlab.levelgroup.ru/devops/approve-checker/internal/core/config"
@@ -23,6 +24,20 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		color.Magenta("🚧 Config:")
+		color.Magenta("\t⚙️ APPROVE_MIN_APPROVAL_ROLE : %d", cfg.Approve.MinApprovalRole)
+		color.Magenta("\t⚙️ APPROVE_APPROVAL_AUTHORS: %s", strings.Join(cfg.Approve.ApprovalAuthors, ", "))
+		color.Magenta("\t⚙️ APPROVE_MIN_APPROVAL_COUNT: %d", cfg.Approve.MinApprovalCount)
+		if cfg.GitLab.Token == "" {
+			color.Magenta("\t⚙️ GITLAB_TOKEN: [IS EMPTY]")
+		} else {
+			color.Magenta("\t⚙️ GITLAB_TOKEN: [CONFIGURED]")
+		}
+
+		color.Magenta("\t⚙️ CI_SERVER_URL: %s", cfg.GitLab.Host)
+		color.Magenta("\t⚙️ CI_PROJECT_ID: %s", cfg.GitLab.ProjectID)
+		color.Magenta("\t⚙️ CI_MERGE_REQUEST_IID: %d", cfg.GitLab.MergeRequestIID)
+
 		c, err := gitlab.NewClient(cfg)
 		if err != nil {
 			slog.Error("make gitlab client was failed", "err", err)
@@ -39,17 +54,16 @@ var rootCmd = &cobra.Command{
 			t := fmt.Sprintf(`Merge request was not approved!
 
 Please receive minimum %d approves.
-
 From the next user(-s): (%s). Or from any project members with role greater or equal then "%s".`,
 				cfg.Approve.MinApprovalCount,
 				strings.Join(cfg.Approve.ApprovalAuthors, ","),
 				gitlab.AccessLevelString(cfg.Approve.MinApprovalRole))
 
-			slog.Error(t)
+			color.Red("❌ %s", t)
 			os.Exit(1)
 		}
 
-		slog.Info("Merge request was approved! Great job!")
+		color.Green("✅ Merge request was approved! Great job!")
 	},
 }
 
